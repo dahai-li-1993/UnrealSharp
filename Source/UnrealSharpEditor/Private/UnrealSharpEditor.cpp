@@ -153,7 +153,10 @@ void FUnrealSharpEditorModule::OnMergeManagedSlnAndNativeSln()
 	FFileHelper::LoadFileToStringArray(ManagedSlnFileLines, *ManagedSolutionPath);
 
 	TArray<FString> ManagedProjectLines;
+	TArray<FString> ManagedProjectGUIDs;
+	TArray<FString> ManagedNestedProjectLines;
 
+	// Extract project declarations and GUIDs from managed solution
 	for (int32 idx = 0; idx < ManagedSlnFileLines.Num(); ++idx)
 	{
 		FString Line = ManagedSlnFileLines[idx];
@@ -161,9 +164,46 @@ void FUnrealSharpEditorModule::OnMergeManagedSlnAndNativeSln()
 		if (Line.StartsWith(TEXT("Project(\"{")) || Line.StartsWith(TEXT("EndProject")))
 		{
 			ManagedProjectLines.Add(Line);
+
+			// Extract project GUID from .csproj project lines
+			if (Line.StartsWith(TEXT("Project(\"{")) && Line.Contains(TEXT(".csproj")))
+			{
+				// Line format: Project("{TypeGUID}") = "Name", "Path", "{ProjectGUID}"
+				int32 LastBraceOpen = Line.Find(TEXT("{"), ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+				int32 LastBraceClose = Line.Find(TEXT("}"), ESearchCase::IgnoreCase, ESearchDir::FromEnd);
+				if (LastBraceOpen != INDEX_NONE && LastBraceClose != INDEX_NONE && LastBraceClose > LastBraceOpen)
+				{
+					FString ProjectGUID = Line.Mid(LastBraceOpen, LastBraceClose - LastBraceOpen + 1);
+					ManagedProjectGUIDs.Add(ProjectGUID);
+				}
+			}
 		}
 	}
 
+	// Extract NestedProjects section from managed solution
+	bool bInNestedSection = false;
+	for (int32 idx = 0; idx < ManagedSlnFileLines.Num(); ++idx)
+	{
+		FString Line = ManagedSlnFileLines[idx];
+		Line.ReplaceInline(TEXT("\n"), TEXT(""));
+
+		if (Line.Contains(TEXT("GlobalSection(NestedProjects)")))
+		{
+			bInNestedSection = true;
+			continue;
+		}
+		if (bInNestedSection)
+		{
+			if (Line.Contains(TEXT("EndGlobalSection")))
+			{
+				bInNestedSection = false;
+				continue;
+			}
+			ManagedNestedProjectLines.Add(Line);
+		}
+	}
+
+	// Insert project declarations with adjusted paths
 	for (int32 idx = 0; idx < ManagedProjectLines.Num(); ++idx)
 	{
 		FString Line = ManagedProjectLines[idx];
@@ -178,6 +218,94 @@ void FUnrealSharpEditorModule::OnMergeManagedSlnAndNativeSln()
 			}
 		}
 		NativeSlnFileLines.Insert(Line, LastEndProjectIdx + 1 + idx);
+	}
+
+	// Find the end of ProjectConfigurationPlatforms section in native solution
+	int32 ConfigSectionEndIdx = INDEX_NONE;
+	bool bInConfigSection = false;
+	for (int32 idx = 0; idx < NativeSlnFileLines.Num(); ++idx)
+	{
+		FString Line = NativeSlnFileLines[idx];
+		if (Line.Contains(TEXT("GlobalSection(ProjectConfigurationPlatforms)")))
+		{
+			bInConfigSection = true;
+		}
+		else if (bInConfigSection && Line.Contains(TEXT("EndGlobalSection")))
+		{
+			ConfigSectionEndIdx = idx;
+			break;
+		}
+	}
+
+	// Insert configuration mappings for C# projects
+	if (ConfigSectionEndIdx != INDEX_NONE && ManagedProjectGUIDs.Num() > 0)
+	{
+		// All Unreal solution configurations that C# projects need mappings for
+		TArray<FString> UnrealConfigs = {
+			TEXT("DebugGame Editor|Win64"),
+			TEXT("DebugGame Editor|Win64-arm64"),
+			TEXT("DebugGame Editor|Win64-arm64ec"),
+			TEXT("DebugGame|Win64"),
+			TEXT("DebugGame|Win64-arm64"),
+			TEXT("DebugGame|Win64-arm64ec"),
+			TEXT("Development Editor|Win64"),
+			TEXT("Development Editor|Win64-arm64"),
+			TEXT("Development Editor|Win64-arm64ec"),
+			TEXT("Development|Win64"),
+			TEXT("Development|Win64-arm64"),
+			TEXT("Development|Win64-arm64ec"),
+			TEXT("Shipping|Win64"),
+			TEXT("Shipping|Win64-arm64"),
+			TEXT("Shipping|Win64-arm64ec")
+		};
+
+		TArray<FString> ConfigLines;
+		for (const FString& ProjectGUID : ManagedProjectGUIDs)
+		{
+			for (const FString& UnrealConfig : UnrealConfigs)
+			{
+				// Map all Unreal configs to Debug|Any CPU for C# projects
+				ConfigLines.Add(FString::Printf(TEXT("\t\t%s.%s.ActiveCfg = Debug|Any CPU"), *ProjectGUID, *UnrealConfig));
+				ConfigLines.Add(FString::Printf(TEXT("\t\t%s.%s.Build.0 = Debug|Any CPU"), *ProjectGUID, *UnrealConfig));
+			}
+		}
+
+		// Insert config lines before EndGlobalSection
+		for (int32 idx = 0; idx < ConfigLines.Num(); ++idx)
+		{
+			NativeSlnFileLines.Insert(ConfigLines[idx], ConfigSectionEndIdx + idx);
+		}
+
+		// Update the end index after insertions
+		ConfigSectionEndIdx += ConfigLines.Num();
+	}
+
+	// Find and insert into NestedProjects section
+	if (ManagedNestedProjectLines.Num() > 0)
+	{
+		int32 NestedSectionEndIdx = INDEX_NONE;
+		bool bInNested = false;
+		for (int32 idx = 0; idx < NativeSlnFileLines.Num(); ++idx)
+		{
+			FString Line = NativeSlnFileLines[idx];
+			if (Line.Contains(TEXT("GlobalSection(NestedProjects)")))
+			{
+				bInNested = true;
+			}
+			else if (bInNested && Line.Contains(TEXT("EndGlobalSection")))
+			{
+				NestedSectionEndIdx = idx;
+				break;
+			}
+		}
+
+		if (NestedSectionEndIdx != INDEX_NONE)
+		{
+			for (int32 idx = 0; idx < ManagedNestedProjectLines.Num(); ++idx)
+			{
+				NativeSlnFileLines.Insert(ManagedNestedProjectLines[idx], NestedSectionEndIdx + idx);
+			}
+		}
 	}
 
 	FString MixedSlnPath = NativeSolutionPath.LeftChop(4) + FString(".Mixed.sln");
