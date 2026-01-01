@@ -41,6 +41,11 @@
     <Analyzer Include="$(UnrealSharpPluginDir)Binaries\Managed\netstandard2.0\UnrealSharp.SourceGenerators.dll"
               Private="false" CopyToPublishDirectory="Never" />
   </ItemGroup>
-  
-  
+
+  <!-- Exclude Diversion conflict indicator files from compilation -->
+  <ItemGroup>
+    <Compile Remove="**/*.dv-conflict.cs" />
+    <None Include="**/*.dv-conflict.cs" />
+  </ItemGroup>
+
 </Project>
