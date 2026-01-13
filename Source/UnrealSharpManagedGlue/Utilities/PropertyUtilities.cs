@@ -162,6 +162,8 @@ public static class PropertyUtilities
         {
             action(property.ValueProperty);
         }
+        
+        action(property.ValueProperty);
     }
     
     public static void ForEachInnerPropertyTranslator(this UhtContainerBaseProperty property, Action<PropertyTranslator> action)
