@@ -1,6 +1,38 @@
 #include "Extensions/Libraries/CSWorldExtensions.h"
 #include "UnrealSharpCore.h"
+#include "Engine/Engine.h"
 #include "GameFramework/Actor.h"
+
+namespace
+{
+	UWorld* GetFallbackWorld()
+	{
+		if (!GEngine)
+		{
+			return nullptr;
+		}
+
+		for (const FWorldContext& WorldContext : GEngine->GetWorldContexts())
+		{
+			UWorld* World = WorldContext.World();
+			if (IsValid(World) && World->IsGameWorld())
+			{
+				return World;
+			}
+		}
+
+		for (const FWorldContext& WorldContext : GEngine->GetWorldContexts())
+		{
+			UWorld* World = WorldContext.World();
+			if (IsValid(World))
+			{
+				return World;
+			}
+		}
+
+		return nullptr;
+	}
+}
 
 AActor* UCSWorldExtensions::SpawnActor(const UObject* WorldContextObject, const TSubclassOf<AActor>& Class, const FTransform& Transform, const FCSSpawnActorParameters& InSpawnParameters)
 {
@@ -44,18 +76,28 @@ FURL UCSWorldExtensions::WorldURL(const UObject* WorldContextObject)
 
 AActor* UCSWorldExtensions::SpawnActor_Internal(const UObject* WorldContextObject, const TSubclassOf<AActor>& Class, const FTransform& Transform, const FCSSpawnActorParameters& SpawnParameters, bool bDeferConstruction)
 {
-	if (!IsValid(WorldContextObject) || !IsValid(Class))
+	if (!IsValid(Class))
 	{
-		UE_LOG(LogUnrealSharp, Error, TEXT("Invalid world context object or class"));
+		UE_LOG(LogUnrealSharp, Error, TEXT("Invalid class for SpawnActor"));
 		return nullptr;
 	}
 
-	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::LogAndReturnNull);
+	UWorld* World = nullptr;
+	if (IsValid(WorldContextObject))
+	{
+		World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+	}
 
 	if (!IsValid(World))
 	{
-		UE_LOG(LogUnrealSharp, Error, TEXT("Failed to get world from context object"));
-		return nullptr;
+		World = GetFallbackWorld();
+		if (!IsValid(World))
+		{
+			UE_LOG(LogUnrealSharp, Error, TEXT("Failed to resolve world for SpawnActor"));
+			return nullptr;
+		}
+
+		UE_LOG(LogUnrealSharp, Warning, TEXT("SpawnActor: Using fallback world context"));
 	}
 
 	FActorSpawnParameters SpawnParams;
