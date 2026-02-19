@@ -19,7 +19,6 @@ public abstract class DelegateBase<TDelegate> where TDelegate : Delegate
     
     public abstract void Remove(TDelegate handler);
     public abstract void Add(TDelegate handler);
-    public abstract void AddUnique(TDelegate handler);
     
     public abstract bool Contains(TDelegate handler);
     public abstract void Clear();
@@ -113,14 +112,6 @@ public abstract class TDelegateBase<T> where T : Delegate
     }
 
     /// <summary>
-    /// Adds a function to the delegate only if it is not already bound.
-    /// </summary>
-    public void AddUnique(T handler)
-    {
-        InnerDelegate.AddUnique(handler);
-    }
-    
-    /// <summary>
     /// Checks if the delegate is bound to any UObject.
     /// </summary>
     public bool IsBound => InnerDelegate.IsBound;
@@ -175,6 +166,23 @@ public abstract class TDelegateBase<T> where T : Delegate
 
 public class TMulticastDelegate<T> : TDelegateBase<T> where T : Delegate
 {
+    /// <summary>
+    /// Adds a function only if that exact handler is not already bound.
+    /// </summary>
+    public void AddUnique(T handler)
+    {
+        if (InnerDelegate is MulticastDelegate<T> multicastDelegate)
+        {
+            multicastDelegate.AddUnique(handler);
+            return;
+        }
+
+        if (!InnerDelegate.Contains(handler))
+        {
+            InnerDelegate.Add(handler);
+        }
+    }
+
     public static TMulticastDelegate<T> operator +(TMulticastDelegate<T> thisDelegate, T handler)
     {
         thisDelegate.InnerDelegate.Add(handler);
