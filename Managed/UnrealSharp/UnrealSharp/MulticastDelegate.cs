@@ -52,6 +52,16 @@ public abstract class MulticastDelegate<TDelegate> : DelegateBase<TDelegate> whe
         FMulticastDelegatePropertyExporter.CallAddDelegate(_nativeProperty, _nativeDelegate, targetObject.NativeObject, handler.Method.Name);
     }
 
+    public override void AddUnique(TDelegate handler)
+    {
+        if (handler.Target is not UObject targetObject)
+        {
+            throw new ArgumentException("The callback for a multicast delegate must be a valid UFunction defined on a UClass", nameof(handler));
+        }
+
+        FMulticastDelegatePropertyExporter.CallAddUniqueDelegate(_nativeProperty, _nativeDelegate, targetObject.NativeObject, handler.Method.Name);
+    }
+
     public override void Remove(TDelegate handler)
     {
         if (handler.Target is not UObject targetObject)

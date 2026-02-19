@@ -19,6 +19,7 @@ public abstract class DelegateBase<TDelegate> where TDelegate : Delegate
     
     public abstract void Remove(TDelegate handler);
     public abstract void Add(TDelegate handler);
+    public abstract void AddUnique(TDelegate handler);
     
     public abstract bool Contains(TDelegate handler);
     public abstract void Clear();
@@ -109,6 +110,14 @@ public abstract class TDelegateBase<T> where T : Delegate
     public void Add(T handler)
     {
         InnerDelegate.Add(handler);
+    }
+
+    /// <summary>
+    /// Adds a function to the delegate only if it is not already bound.
+    /// </summary>
+    public void AddUnique(T handler)
+    {
+        InnerDelegate.AddUnique(handler);
     }
     
     /// <summary>

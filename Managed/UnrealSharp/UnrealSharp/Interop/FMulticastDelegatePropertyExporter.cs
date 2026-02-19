@@ -7,6 +7,7 @@ namespace UnrealSharp.Interop;
 public static unsafe partial class FMulticastDelegatePropertyExporter
 {
     public static delegate* unmanaged<IntPtr, IntPtr, IntPtr, string, void> AddDelegate;
+    public static delegate* unmanaged<IntPtr, IntPtr, IntPtr, string, void> AddUniqueDelegate;
     public static delegate* unmanaged<IntPtr, NativeBool> IsBound;
     public static delegate* unmanaged<IntPtr, ref UnmanagedArray, void> ToString;
     public static delegate* unmanaged<IntPtr, IntPtr, IntPtr, string, void> RemoveDelegate;
