@@ -52,7 +52,7 @@ public abstract class MulticastDelegate<TDelegate> : DelegateBase<TDelegate> whe
         FMulticastDelegatePropertyExporter.CallAddDelegate(_nativeProperty, _nativeDelegate, targetObject.NativeObject, handler.Method.Name);
     }
 
-    public override void AddUnique(TDelegate handler)
+    public virtual void AddUnique(TDelegate handler)
     {
         if (handler.Target is not UObject targetObject)
         {
