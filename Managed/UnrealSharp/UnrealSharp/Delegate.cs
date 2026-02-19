@@ -70,11 +70,6 @@ public abstract class Delegate<TDelegate> : DelegateBase<TDelegate> where TDeleg
         FunctionName = new FName(handler.Method.Name);
     }
 
-    public override void AddUnique(TDelegate handler)
-    {
-        Add(handler);
-    }
-
     public override void Remove(TDelegate handler)
     {
         if (!Contains(handler))
