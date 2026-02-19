@@ -30,6 +30,9 @@ public:
 	static void AddDelegate(FMulticastDelegateProperty* DelegateProperty, FMulticastScriptDelegate* Delegate, UObject* Target, const char* FunctionName);
 
 	UNREALSHARP_FUNCTION()
+	static void AddUniqueDelegate(FMulticastDelegateProperty* DelegateProperty, FMulticastScriptDelegate* Delegate, UObject* Target, const char* FunctionName);
+
+	UNREALSHARP_FUNCTION()
 	static bool IsBound(FMulticastScriptDelegate* Delegate);
 
 	UNREALSHARP_FUNCTION()

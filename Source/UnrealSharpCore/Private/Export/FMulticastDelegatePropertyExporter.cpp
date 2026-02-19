@@ -6,6 +6,18 @@ void UFMulticastDelegatePropertyExporter::AddDelegate(FMulticastDelegateProperty
 	DelegateProperty->AddDelegate(NewScriptDelegate, nullptr, Delegate);
 }
 
+void UFMulticastDelegatePropertyExporter::AddUniqueDelegate(FMulticastDelegateProperty* DelegateProperty, FMulticastScriptDelegate* Delegate, UObject* Target, const char* FunctionName)
+{
+	FScriptDelegate NewScriptDelegate = MakeScriptDelegate(Target, FunctionName);
+	const FMulticastScriptDelegate* MulticastDelegate = TryGetSparseMulticastDelegate(DelegateProperty, Delegate);
+	if (MulticastDelegate->Contains(NewScriptDelegate))
+	{
+		return;
+	}
+
+	DelegateProperty->AddDelegate(NewScriptDelegate, nullptr, Delegate);
+}
+
 bool UFMulticastDelegatePropertyExporter::IsBound(FMulticastScriptDelegate* Delegate)
 {
 	return Delegate->IsBound();
