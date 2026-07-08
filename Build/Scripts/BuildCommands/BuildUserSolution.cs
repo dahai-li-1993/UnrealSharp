@@ -9,6 +9,7 @@ namespace UnrealSharp.Automation.BuildCommands;
 [Help("Builds the user written C# code for the active project and emits the user load order.")]
 [Help("OutputPath=<Path>", "Output path for the build output and emitted load order.")]
 [Help("TargetConfiguration=<Config>", "The build configuration (Debug, DebugGame, Development, Shipping, etc.). Defaults to Development.")]
+[Help("UETargetType=<TargetType>", "The Unreal Engine target type (Editor, Game, Client, Server). Defaults to Editor.")]
 [Help("clp=<Args>", "Optional CLP arguments to pass to the build process.")]
 [Help("ExtraArguments=<Arg>+<Arg>", "Additional arguments forwarded to dotnet build/publish.")]
 public class BuildUserSolution : BuildCommand
@@ -18,6 +19,7 @@ public class BuildUserSolution : BuildCommand
         List<KeyValuePair<string, string>> CommandParams = new List<KeyValuePair<string, string>>
         {
             new("TargetConfiguration", ParseParamValue("TargetConfiguration", nameof(UnrealTargetConfiguration.Development))),
+            new("UETargetType", ParseParamValue("UETargetType", nameof(TargetType.Editor))),
             new("LoadOrderName", LoadOrderUtilities.UserLoadOrderName),
             new("SolutionDirectory", this.GetProjectScriptFolder()),
             new("OutputPath", ParseRequiredStringParam("OutputPath")),

@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using EpicGames.Core;
 using UnrealSharpManagedGlue.SourceGeneration;
 using UnrealSharpManagedGlue.Utilities;
+using UnrealBuildTool;
 
 namespace UnrealSharpManagedGlue.Exporters;
 
@@ -22,6 +24,7 @@ public static class PreprocessorExporter
         string csproj = Path.Combine(engineDirectory, "Intermediate", "Build", "BuildRulesProjects", "UE5Rules", "UE5Rules.csproj");
         if (!File.Exists(csproj))
         {
+            AddEngineVersionDefines(engineDirectory, definesSet);
             return definesSet;
         }
 
@@ -32,6 +35,7 @@ public static class PreprocessorExporter
         }
         catch 
         {
+            AddEngineVersionDefines(engineDirectory, definesSet);
             return definesSet; 
         }
 
@@ -56,7 +60,33 @@ public static class PreprocessorExporter
             }
         }
 
+        AddEngineVersionDefines(engineDirectory, definesSet);
+
         return definesSet;
+    }
+
+    private static void AddEngineVersionDefines(string engineDirectory, HashSet<string> definesSet)
+    {
+        FileReference versionFile = new FileReference(Path.Combine(engineDirectory, "Build", "Build.version"));
+        if (!BuildVersion.TryRead(versionFile, out BuildVersion? version))
+        {
+            return;
+        }
+
+        for (int minorVersion = 17; minorVersion <= 30; ++minorVersion)
+        {
+            definesSet.Add($"UE_4_{minorVersion}_OR_LATER");
+        }
+
+        if (version.MajorVersion < 5)
+        {
+            return;
+        }
+
+        for (int minorVersion = 0; minorVersion <= version.MinorVersion; ++minorVersion)
+        {
+            definesSet.Add($"UE_5_{minorVersion}_OR_LATER");
+        }
     }
 
     private static void GenerateMSBuildProps(HashSet<string> defines)

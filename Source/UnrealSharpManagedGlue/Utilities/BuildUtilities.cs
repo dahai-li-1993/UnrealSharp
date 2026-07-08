@@ -18,7 +18,8 @@ public static class BuildUtilities
         List<KeyValuePair<string, string>> actionArgs =
         [
             new("Folders", Path.Combine(GeneratorStatics.ManagedPath, "UnrealSharp")),
-            new("TargetConfiguration", GeneratorStatics.TargetConfiguration.ToString())
+            new("TargetConfiguration", GeneratorStatics.TargetConfiguration.ToString()),
+            new("ExtraArguments", $"-p:UETargetType={GeneratorStatics.TargetType}")
         ];
         
         UnrealSharpAutomationUtilities.InvokeUnrealSharpAutomation("BuildSolution", actionArgs);

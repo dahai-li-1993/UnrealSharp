@@ -12,6 +12,7 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <TargetFramework Condition="$(UE5Rules_DefineConstants.Contains('UE_5_8_OR_LATER'))">net10.0</TargetFramework>
+        <TargetFramework Condition="Exists('$(EngineDir)\Binaries\DotNET\AutomationTool\AutomationUtils\net10.0\AutomationUtils.Automation.dll')">net10.0</TargetFramework>
     </PropertyGroup>
     
 </Project>

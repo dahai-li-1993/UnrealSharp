@@ -13,6 +13,7 @@ namespace UnrealSharp.Automation.BuildCommands;
 [Help("LoadOrderName=<Name>", "Name for the emitted load order file, without extension.")]
 [Help("OutputPath=<Path>", "Output path for the build output and emitted load order.")]
 [Help("TargetConfiguration=<Config>", "The build configuration (Debug, DebugGame, Development, Shipping, etc.).")]
+[Help("UETargetType=<TargetType>", "The Unreal Engine target type (Editor, Game, Client, Server). Defaults to Editor.")]
 [Help("clp=<Args>", "Optional CLP arguments to pass to the build process.")]
 [Help("ExtraArguments=<Arg>+<Arg>", "Additional arguments forwarded to dotnet build/publish.")]
 [Help("IsCollectible=<true/false>", "Whether the emitted assemblies should be marked as collectible. Defaults to false when omitted.")]
@@ -29,6 +30,7 @@ public class BuildEmitLoadOrder : BuildCommand
         string OutputPath = ParseRequiredStringParam("OutputPath");
         string LoadOrderName = ParseRequiredStringParam("LoadOrderName");
         string[] Projects = ParseParamValues("Projects");
+        string TargetType = ParseParamValue("UETargetType", nameof(UnrealBuildTool.TargetType.Editor));
 
         LoadOrderOptions Options = new LoadOrderOptions
         {
@@ -36,7 +38,7 @@ public class BuildEmitLoadOrder : BuildCommand
             Priority = ParseParamInt("Priority")
         };
 
-        List<string> BuildArguments = BuildSolutionArguments(OutputPath);
+        List<string> BuildArguments = BuildSolutionArguments(OutputPath, TargetType);
 
         BuildCommands.BuildSolution.RunBuild(SolutionPath, TargetConfiguration, publish: true, BuildArguments);
         
@@ -49,11 +51,12 @@ public class BuildEmitLoadOrder : BuildCommand
         LoadOrderUtilities.TryEmitLoadOrder(projectFiles, outputPath, loadOrderName, options);
     }
 
-    private List<string> BuildSolutionArguments(string outputPath)
+    private List<string> BuildSolutionArguments(string outputPath, string targetType)
     {
         List<string> Arguments = new List<string>
         {
-            $"-p:PublishDir={outputPath}"
+            $"-p:PublishDir={outputPath}",
+            $"-p:UETargetType={targetType}"
         };
 
         string[] Clp = ParseParamValues("clp");
