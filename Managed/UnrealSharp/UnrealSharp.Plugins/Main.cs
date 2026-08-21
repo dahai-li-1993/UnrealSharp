@@ -46,7 +46,21 @@ public static class Main
         catch (Exception exception)
         {
             Console.WriteLine(exception);
+            WriteCrashLog(new string(workingDirectoryPath), exception);
             return NativeBool.False;
+        }
+    }
+
+    private static void WriteCrashLog(string workingDirectory, Exception exception)
+    {
+        try
+        {
+            string logPath = Path.Combine(workingDirectory, "UnrealSharpInitError.log");
+            File.WriteAllText(logPath, $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}{Environment.NewLine}{exception}{Environment.NewLine}");
+        }
+        catch
+        {
+            // Best-effort only: if the working directory isn't writable, there's nothing further we can do here.
         }
     }
 }

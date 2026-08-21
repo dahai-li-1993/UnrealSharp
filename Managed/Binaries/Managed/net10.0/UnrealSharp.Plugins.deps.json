@@ -1,0 +1,108 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "UnrealSharp.Plugins/1.0.0": {
+        "dependencies": {
+          "Microsoft.Build.Locator": "1.9.1",
+          "UnrealSharp": "1.0.0",
+          "UnrealSharp.Core": "1.0.0",
+          "UnrealSharp.Log": "1.0.0"
+        },
+        "runtime": {
+          "UnrealSharp.Plugins.dll": {}
+        }
+      },
+      "Microsoft.Build.Locator/1.9.1": {
+        "runtime": {
+          "lib/net8.0/Microsoft.Build.Locator.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.9.1.3007"
+          }
+        }
+      },
+      "UnrealSharp/1.0.0": {
+        "dependencies": {
+          "UnrealSharp.Binds": "1.0.0",
+          "UnrealSharp.Core": "1.0.0",
+          "UnrealSharp.Log": "1.0.0"
+        },
+        "runtime": {
+          "UnrealSharp.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "UnrealSharp.Binds/1.0.0": {
+        "runtime": {
+          "UnrealSharp.Binds.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "UnrealSharp.Core/1.0.0": {
+        "dependencies": {
+          "UnrealSharp.Binds": "1.0.0",
+          "UnrealSharp.Log": "1.0.0"
+        },
+        "runtime": {
+          "UnrealSharp.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "UnrealSharp.Log/1.0.0": {
+        "dependencies": {
+          "UnrealSharp.Binds": "1.0.0"
+        },
+        "runtime": {
+          "UnrealSharp.Log.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "UnrealSharp.Plugins/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Microsoft.Build.Locator/1.9.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-UTO1acAAxYkpI8lU9ff5D9kn4p85bFwph28Y3QPVM9qy5HKQy3kpB6gWcuVGtlSPtvfzfC67CMDHO/JDys2gNQ==",
+      "path": "microsoft.build.locator/1.9.1",
+      "hashPath": "microsoft.build.locator.1.9.1.nupkg.sha512"
+    },
+    "UnrealSharp/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "UnrealSharp.Binds/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "UnrealSharp.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "UnrealSharp.Log/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

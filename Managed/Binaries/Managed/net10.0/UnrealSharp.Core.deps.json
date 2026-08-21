@@ -1,0 +1,56 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "UnrealSharp.Core/1.0.0": {
+        "dependencies": {
+          "UnrealSharp.Binds": "1.0.0",
+          "UnrealSharp.Log": "1.0.0"
+        },
+        "runtime": {
+          "UnrealSharp.Core.dll": {}
+        }
+      },
+      "UnrealSharp.Binds/1.0.0": {
+        "runtime": {
+          "UnrealSharp.Binds.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "UnrealSharp.Log/1.0.0": {
+        "dependencies": {
+          "UnrealSharp.Binds": "1.0.0"
+        },
+        "runtime": {
+          "UnrealSharp.Log.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "UnrealSharp.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "UnrealSharp.Binds/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "UnrealSharp.Log/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

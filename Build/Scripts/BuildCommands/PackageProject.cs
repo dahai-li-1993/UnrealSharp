@@ -61,6 +61,7 @@ public class PackageProject : BuildCommand
         if (options.TargetType != TargetType.Editor)
         {
             Arguments.Add("-p:GenerateDocumentation=false");
+            Arguments.Add("-p:DisableWithEditor=true");
         }
 
         BuildBindingsSolution(Arguments, options.BuildConfiguration);
