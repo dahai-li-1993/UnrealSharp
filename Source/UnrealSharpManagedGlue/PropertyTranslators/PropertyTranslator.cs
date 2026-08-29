@@ -531,7 +531,7 @@ public abstract class PropertyTranslator
 
     public void ExportPropertyArithmetic(GeneratorStringBuilder stringBuilder, UhtProperty property, ArithmeticKind arithmeticKind)
     {
-        string scriptName = property.GetPropertyName();
+        string scriptName = property.GetScriptName();
 
         static string Bin(string op, string lhs, string rhs) => $"{lhs} {op} {rhs}";
 
