@@ -23,10 +23,17 @@ public static class PluginLoader
 			Plugin plugin = new Plugin(assemblyName, isCollectible, assemblyPath);
 			Plugins.Add(assemblyName.Name!, plugin);
 
-			if (!plugin.Load())
+			try
+			{
+				if (!plugin.Load())
+				{
+					throw new InvalidOperationException($"Failed to load plugin: {assemblyName}");
+				}
+			}
+			catch
 			{
 				Plugins.Remove(assemblyName.Name!);
-				throw new InvalidOperationException($"Failed to load plugin: {assemblyName}");
+				throw;
 			}
 
 			LogUnrealSharpPlugins.Log($"Successfully loaded plugin: '{assemblyName}' at '{assemblyPath}'");

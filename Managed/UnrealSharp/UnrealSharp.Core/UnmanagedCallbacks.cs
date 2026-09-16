@@ -169,39 +169,17 @@ public static class UnmanagedCallbacks
 
             return FindTypeInAssembly(loadedAssembly, fullTypeNameString);
         }
-        catch (TypeLoadException ex)
+        catch (Exception ex)
         {
-            LogUnrealSharpCore.LogError($"TypeLoadException while trying to look up managed type: {ex.Message}");
+            LogUnrealSharpCore.LogError($"Exception while trying to look up managed type: {ex.Message}");
             return IntPtr.Zero;
         }
     }
     
     private static IntPtr FindTypeInAssembly(Assembly assembly, string fullTypeName)
     {
-        Type[] types = assembly.GetTypes();
-        foreach (Type type in types)
-        {
-            foreach (CustomAttributeData attributeData in type.CustomAttributes)
-            {
-                if (attributeData.AttributeType.FullName != typeof(GeneratedTypeAttribute).FullName)
-                {
-                    continue;
-                }
-
-                if (attributeData.ConstructorArguments.Count != 2)
-                {
-                    continue;
-                }
-
-                string fullName = (string)attributeData.ConstructorArguments[1].Value!;
-                if (fullName == fullTypeName)
-                {
-                    return GCHandle.ToIntPtr(GCHandleUtilities.AllocateStrongPointer(type, assembly));
-                }
-            }
-        }
-
-        return IntPtr.Zero;
+        Type? type = GeneratedTypeIndex.FindType(assembly, fullTypeName);
+        return type == null ? IntPtr.Zero : GCHandle.ToIntPtr(GCHandleUtilities.AllocateStrongPointer(type, assembly));
     }
     
     [UnmanagedCallersOnly]

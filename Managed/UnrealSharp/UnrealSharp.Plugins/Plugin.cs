@@ -59,6 +59,7 @@ public class Plugin
         Assembly = new WeakReference(assembly);
         
         RuntimeHelpers.RunModuleConstructor(assembly.ManifestModule.ModuleHandle);
+        GeneratedTypeIndex.Prepare(assembly);
         
         StartupModule();
         return true;
