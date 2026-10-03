@@ -75,11 +75,21 @@ public static class FileExporter
 		string engineName = type is UhtFunction function ? DelegateBasePropertyTranslator.GetDelegateName(function) : type.EngineName;
 
 		string directory = type.Package.GetPackageOutputDirectory();
-		AffectedFiles.Add(GetFilePath(engineName, directory));
+		bool hasExtensions = type is UhtStruct uhtStruct && uhtStruct.Functions.Any(f => f.HasMetadata("ExtensionMethod"));
 
-		if (type is UhtStruct uhtStruct && uhtStruct.Functions.Any(f => f.HasMetadata("ExtensionMethod")))
+		ReadWriteLock.EnterWriteLock();
+		try
 		{
-			AffectedFiles.Add(GetFilePath($"{engineName}_Extensions", directory));
+			AffectedFiles.Add(GetFilePath(engineName, directory));
+
+			if (hasExtensions)
+			{
+				AffectedFiles.Add(GetFilePath($"{engineName}_Extensions", directory));
+			}
+		}
+		finally
+		{
+			ReadWriteLock.ExitWriteLock();
 		}
 	}
 
