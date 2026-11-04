@@ -72,7 +72,9 @@ void UCSFunction_Params::InvokeManagedMethod_Params(UObject* ObjectToInvokeOn, F
 	
 	for (FOutParmRec* OutParameter = OutParameters; OutParameter != nullptr; OutParameter = OutParameter->NextOutParm)
 	{
-		if (OutParameter->Property->HasAnyPropertyFlags(CPF_ReturnParm))
+		// Const reference params are read-only. ProcessEvent hands them over as a bitwise copy of the caller's
+		// value, so copying them back would assign a struct onto memory that shares its heap allocations.
+		if (OutParameter->Property->HasAnyPropertyFlags(CPF_ReturnParm | CPF_ConstParm))
 		{
 			continue;
 		}
